@@ -1,0 +1,30 @@
+# --- Core ML & Deep Learning ---
+ultralytics
+torch
+torchvision
+scikit-learn
+xgboost
+
+# --- Computer Vision ---
+opencv-python
+cvzone
+scikit-image
+Pillow
+matplotlib
+tqdm
+
+# --- Filtering/Tracking ---
+filterpy
+lap
+
+# --- Utility ---
+numpy
+pandas
+hydra-core
+pyyaml
+requests
+
+# --- Optional but Useful ---
+seaborn
+plotly
+jupyterlab
