@@ -1,5 +1,7 @@
-#include <Wifi.h>
-#include <WifiUdp.h>
+#include <WiFi.h>
+#include <WiFiUdp.h>
+#include <ArduinoJson.h>
+
 
 const int flexThumbPin = 32;
 const int flexMiddlePin = 33;
