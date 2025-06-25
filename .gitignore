@@ -7,11 +7,11 @@ __pycache__/
 .vscode/
 .idea/
 
-# Datasets
-BACKUP/
-Balloon-1/
-*.dataset.txt
-*.roboflow.txt
+# Exclude backup training data
+models/training datasets/BACKUP/
+
+# Exclude specific test script
+src/test/testing.py
 
 # OS / system files
 .DS_Store
