@@ -1,0 +1,9 @@
+#----Run this on Raspberry Pi----
+ultralytics
+numpy
+opencv-python
+pymavlink
+picamera2
+RPi.GPIO
+
+#picamera2 & RPi.GPIO are for the Raspberry Pi
