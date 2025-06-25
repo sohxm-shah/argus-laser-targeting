@@ -11,10 +11,8 @@ from pymavlink import mavutil
 from picamera2 import Picamera2
 
 '''import RPi.GPIO as GPIO
-
 LASER_PIN = 17
 SERVO_PIN = 12  # GPIO12(PWM0)
-
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(LASER_PIN, GPIO.OUT)
 GPIO.setup(SERVO_PIN, GPIO.OUT)
@@ -25,8 +23,7 @@ servoPwm.start(0)
 model = YOLO("models/argus_model.pt")
 model.model.names = {0: "balloon"}
 
-# Initialize PiCamera2
-cam = Picamera2()
+cam = Picamera2() #initializing PiCamera2
 cam.configure(cam.create_preview_configuration(main={"format": 'RGB888', "size": (640, 480)}))
 cam.start()
 
@@ -36,7 +33,7 @@ frameHeight = 480
 CAMERA_HORIZONTAL_FOV = 62.2  # degrees
 CAMERA_VERTICAL_FOV = 48.8    # degrees
 
-print("[INFO] Connecting to MAVLink on TCP port 5762...")
+print("[INFO] Connecting to MAVLink on TCP port...")
 master = mavutil.mavlink_connection('tcp:192.168.189.18:5762')
 
 print("[INFO] Waiting for heartbeat...")
@@ -50,7 +47,6 @@ print("Awaiting gesture packets...")
 previousTime = time.time()
 gestureCooldown = 1.0
 lastGestureTime = 0
-
 Path("logs").mkdir(exist_ok=True)
 logFile = open("logs/aim_log.csv", mode='a', newline='')
 csvWriter = csv.writer(logFile)
@@ -71,7 +67,7 @@ def setServoAngle(angle):
     angle = max(min(angle, 180), 0)
     dutyCycle = 2 + (angle / 18)
 #    servoPwm.ChangeDutyCycle(dutyCycle)
-    print(f"    Servo Angle Set: {angle}°")
+    print(f"    Servo Angle Set: {angle}Â°")
 
 def fireLaser(duration=1.0):
     print("Laser ON")
@@ -81,7 +77,7 @@ def fireLaser(duration=1.0):
     print("Laser OFF")
 
 def sendYawCommand(yawAngle):
-    print(f"[MAVLINK] Sending yaw command: {yawAngle:.2f}°")
+    print(f"[MAVLINK] Sending yaw command: {yawAngle:.2f}Â°")
     master.mav.command_long_send(
         master.target_system,
         master.target_component,
@@ -103,8 +99,8 @@ def handleAim(boxes):
             panAngle, tiltAngle = mapToServoAngle(cx, cy)
             print(f"Target {i + 1}")
             print(f"    Center     : ({cx}, {cy})")
-            print(f"    Pan Angle  : {panAngle:.2f}° (Yaw)")
-            print(f"    Tilt Angle : {tiltAngle:.2f}° (Servo)")
+            print(f"    Pan Angle  : {panAngle:.2f}Â° (Yaw)")
+            print(f"    Tilt Angle : {tiltAngle:.2f}Â° (Servo)")
             setServoAngle(tiltAngle)
             sendYawCommand(panAngle)
             csvWriter.writerow([logTime, "Aim", cx, cy])
@@ -119,12 +115,12 @@ def handleShoot():
 def handleKillswitch():
     global killedStatus
     killedStatus = True
-    print("KILLSWITCH ACTIVATED — system locked.")
+    print("KILLSWITCH ACTIVATED! System locked.")
 
 def handleKillReset():
     global killedStatus
     killedStatus = False
-    print("SYSTEM UNLOCKED — gesture control re-enabled.")
+    print("SYSTEM UNLOCKED! Gesture control re-enabled.")
 
 while True:
     frame = cam.capture_array()
@@ -167,22 +163,24 @@ while True:
             print(f"Gesture Received: {gesture}")
             previousGesture = gesture
             lastGestureTime = currentTime
-            if killedStatus and gesture != "KillReset":
-                print("Ignored due to KILLSWITCH.")
-            elif gesture == "Aim":
-                handleAim(boxes)
-            elif gesture == "Shoot":
-                handleShoot()
-            elif gesture == "Killswitch":
+
+            if gesture == "Killswitch":
                 handleKillswitch()
-            elif gesture == "KillReset":
-                handleKillReset()
+            else:
+                if killedStatus:
+                    print("SYSTEM UNLOCKED! Kill reset triggered automatically.")
+                    handleKillReset()
+                if gesture == "Aim":
+                    handleAim(boxes)
+                elif gesture == "Shoot":
+                    handleShoot()
+
     except socket.timeout:
         pass
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-    cv2.imshow("A.R.G.U.S. — Gesture Control", annotatedFrame)
+    cv2.imshow("A.R.G.U.S. Detection Window", annotatedFrame)
 
 cam.close()
 cv2.destroyAllWindows()
