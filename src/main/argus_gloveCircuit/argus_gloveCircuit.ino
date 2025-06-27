@@ -2,8 +2,8 @@
 #include <WiFiUdp.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "connectile dysfunction"; //wifi network
-const char* password = "hotsignalsinyourarea";
+const char* ssid = "sohamshah_hotspot"; //wifi network
+const char* password = "sas123";
 
 //rpi recever info
 const char* udpAddress = "192.168.189.197";  //rpi ip
